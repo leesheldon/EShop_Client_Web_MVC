@@ -1,0 +1,106 @@
+﻿@model Client_Web_MVC.Models.ViewModels.ProductsViewModel
+@using Client_Web_MVC.Models
+@using PagedList;
+@using PagedList.Mvc;
+
+@{
+    Layout = "~/Views/Shared/_DienMayLayout.cshtml";
+    List<Photo> photoItems = ViewBag.Photos;
+}
+
+
+<div class="container">
+    <div class="col-md-9">
+        <div class="box">
+            <h2>@ViewBag.Title</h2>
+        </div>
+
+        <div class="row products">
+            @foreach (var item in Model.Products)
+            {
+                Photo photo_01 = Model.Photos.Where(i => i.Id == item.Id && i.IsMain == true).FirstOrDefault();
+                Photo photo_02 = null;
+
+                if (photo_01 == null)
+                {
+                    photo_01 = new Photo();
+                    photo_01.ProductId = item.Id;
+                    photo_01.PictureUrl = ViewBag.Url_Img_PlaceHolder;
+                }
+                else
+                {
+                    photo_02 = Model.Photos.Where(i => i.Id == item.Id && i.Id != photo_01.Id).FirstOrDefault();
+                }
+
+                if (photo_02 == null)
+                {
+                    photo_02 = new Photo();
+                    photo_02.ProductId = item.Id;
+                    photo_02.PictureUrl = ViewBag.Url_Img_PlaceHolder;
+                }
+
+                <div class="col-md-4 col-sm-6">
+                    <div class="product">
+                        <div class="flip-container">
+                            <div class="flipper">
+                                <div class="front">
+                                    <a href="@Url.Action("Details", "Products", new { id = item.Id })">
+                                        <img src="@photo_01.PictureUrl" alt="" style="height: 178px;" class="img-responsive">
+                                    </a>
+                                </div>
+                                <div class="back">
+                                    <a href="@Url.Action("Details", "Products", new { id = item.Id })">
+                                        <img src="@photo_02.PictureUrl" alt="" style="height: 178px;" class="img-responsive">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <a href="@Url.Action("Details", "Products", new { id = item.Id })" class="invisible">
+                            <img src="@photo_01.PictureUrl" alt="" style="height: 178px;" class="img-responsive">
+                        </a>
+                        <div class="text">
+                            <h3>
+                                @Html.ActionLink(item.Name, "Details", "Products", new { id = item.Id }, htmlAttributes: new { @target = "_blank" })
+                            </h3>
+                            <p class="price">@item.Price.ToString("$#,##0.00")</p>
+                            <p class="buttons">
+                                @Html.ActionLink("Details", "Details", "Products", new { id = item.Id }, htmlAttributes: new { @class = "btn btn-default" })
+                                <a href="basket.html" class="btn btn-primary"><i class="fa fa-shopping-cart"></i>Add to cart</a>
+                            </p>
+                        </div>
+                        <!-- /.text -->
+                    </div>
+                    <!-- /.product -->
+                </div>
+                <!-- /.col-md-4 -->
+            }
+        </div>
+        <!-- /.products -->
+
+        <div>
+            Trang: @ViewBag.PageNumber<text>/</text>@ViewBag.PageCount
+        </div>
+        <div class="text-center">
+            @if (ViewBag.BrandId != null)
+            {
+                @Html.PagedListPager((IPagedList)ViewBag.OnePageOfProducts, p => Url.Action("SearchByBrand", new { page = p, id = ViewBag.BrandId }))
+            }
+            @*else if (ViewBag.LoaiID != null)
+            {
+                @Html.PagedListPager(sanphamItems, p => Url.Action("TraCuuTheoLoai", new { page = p, id = ViewBag.LoaiID }))
+            }*@
+            else
+            {
+                @*@Html.PagedListPager(productItems, p => Url.Action("List3", new { page = p }))*@
+            }
+
+        </div>
+    </div>
+    <!-- /.col-md-9 -->
+
+    <div class="col-md-3">
+        @Html.Action("BrandsMenuPartial", "Brands", new { brandsList = ViewBag.BrandsList })
+    </div>
+    <!-- /.col-md-3 -->
+</div>
+<!-- /.container -->

@@ -1,0 +1,108 @@
+﻿@model Client_Web_MVC.Models.Product
+
+@{
+    ViewBag.Title = "Delete Product";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-info">Delete Product</h2>
+
+<h3 class="text-danger">Bạn có thật sự muốn xóa không?</h3>
+<div>
+    <h4 class="text-info">Product Information</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ProductBrandId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ProductBrand.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ProductTypeId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ProductType.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Price)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Price)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+                
+    </dl>
+
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "deleteForm" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-actions no-color">
+            <input type="button" value="Delete" class="btn btn-danger" onclick="validateInput()" /> |
+            @Html.ActionLink("Back to List", "Index")
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function validateInput() {
+            //return confirm('Are you sure you wish to delete this Product?');
+            
+            //swal({
+            //    title: "Delete Product?",
+            //    text: "Are you sure that you want to delete this Product?",
+            //    type: "warning",
+            //    showCancelButton: true,
+            //    closeOnConfirm: false,
+            //    confirmButtonText: "Yes, delete it!",
+            //    confirmButtonClass: "btn-danger"
+            //}).then(function () {
+            //    $("#deleteForm").submit();
+            //});
+                
+                //function (isConfirm) {
+                //    if (isConfirm) {
+                //        return true; 
+                //    } else {
+                //        return false;
+                //    }
+            //});
+
+            swal({
+                title: "Delete Product?",
+                text: "Are you sure that you want to delete this Product?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true
+            }).then((willDelete) => {
+                if (willDelete) {
+                    $("#deleteForm").submit();
+                }
+            });
+
+        }
+
+    </script>
+}

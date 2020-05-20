@@ -1,0 +1,13 @@
+﻿@{
+    ViewBag.Title = "Trang chủ";
+    Layout = "~/Views/Shared/_DienMayLayout.cshtml";
+}
+
+@* Tích hợp Partial View (chứa nội dung tĩnh) vào *@
+@Html.Partial("_MainSliderPartial")
+
+
+@section pageFooter{
+    @* Tích hợp Partial view (có nội dung tĩnh) vào *@
+    @Html.Partial("_FooterPartial")
+}

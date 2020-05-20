@@ -1,0 +1,49 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    string thongBaoLoi = null;
+    WebGrid grid = null;
+    try
+    {
+        grid = new WebGrid(source: Model, rowsPerPage: 50);
+    }
+    catch (Exception ex)
+    {
+        thongBaoLoi = "Lỗi: Truy xuất dữ liệu.";
+    }
+}
+
+<h2 class="text-info">Danh sách Sản phẩm</h2>
+<h4 class="bg-info">Trang: @(grid.PageIndex + 1)<text>/</text>@grid.PageCount (Total: @ViewBag.TotalItems)</h4>
+@Html.ActionLink("Create New", "Create", routeValues: null, htmlAttributes: new { @class = "btn btn-primary", @role = "button" })
+<br />
+<br />
+@if (grid != null)
+{
+    @grid.GetHtml(
+        tableStyle: "table table-bordered table-hover",
+        footerStyle: "text-center",
+        mode: WebGridPagerModes.All, firstText: "Trang đầu", lastText: "Trang cuối", previousText: "Trang trước", nextText: "Trang kế",
+        numericLinksCount: 20,
+        columns: grid.Columns(
+            grid.Column("Id", header: "ID", canSort: true),
+            grid.Column("Name", header: "Product Name", format: item => Html.ActionLink((string)item.Name, "Edit", new { id = item.Id })),
+            grid.Column("ProductBrand.Name", header: "Brand", canSort: true),
+            grid.Column("ProductType.Name", header: "Type", canSort: true),
+            grid.Column("Price", header: "Giá bán", format: item => item.Price.ToString("$#,##0.00"), style: "text-right", canSort: true),
+            grid.Column(format: item => Html.ActionLink("Delete", "Delete", new { id = item.Id })),
+            grid.Column(format: item => Html.ActionLink("Upload Image", "Upload", new { id = item.Id })),
+            grid.Column(format: item => Html.Raw($"<img src='{item.Photos[0].PictureUrl}' style='width: 50px; height: 50px;' onclick='alert(`OK {item.Photos[0].FileName}`);' />"))
+            )
+        )
+}
+
+@if (thongBaoLoi != null)
+{
+    <div class="danger alert-danger">
+        <strong>Lưu ý!</strong> @thongBaoLoi
+    </div>
+}
+

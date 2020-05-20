@@ -1,0 +1,22 @@
+﻿@model System.String
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Thông báo</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+
+</head>
+<body>
+    <div class="container-fluid text-warning"> 
+        <h2>Thông báo</h2>
+        <h4>@Html.Raw(Model)</h4>
+    </div>
+</body>
+</html>

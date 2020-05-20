@@ -1,0 +1,174 @@
+﻿@model Client_Web_MVC.Models.Product
+@using Client_Web_MVC.Models
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_DienMayLayout.cshtml";
+
+    Photo photo_01 = Model.Photos.Where(i => i.Id == Model.Id && i.IsMain == true).FirstOrDefault();
+    Photo photo_02 = null;
+    Photo photo_03 = null;
+
+    if (photo_01 == null)
+    {
+        photo_01 = new Photo();
+        photo_01.ProductId = Model.Id;
+        photo_01.PictureUrl = ViewBag.Url_Img_PlaceHolder;
+    }
+    else
+    {
+        photo_02 = Model.Photos.Where(i => i.Id == Model.Id && i.Id != photo_01.Id).FirstOrDefault();
+    }
+
+    if (photo_02 == null)
+    {
+        photo_02 = new Photo();
+        photo_02.ProductId = Model.Id;
+        photo_02.PictureUrl = ViewBag.Url_Img_PlaceHolder;
+    }
+    else
+    {
+        photo_03 = Model.Photos.Where(i => i.Id == Model.Id && i.Id != photo_01.Id && i.Id != photo_02.Id).FirstOrDefault();
+    }
+
+    if (photo_03 == null)
+    {
+        photo_03 = new Photo();
+        photo_03.ProductId = Model.Id;
+        photo_03.PictureUrl = ViewBag.Url_Img_PlaceHolder;
+    }
+
+}
+
+<div class="container">
+    <div class="col-md-3">
+        @* Danh sách Loại theo Chủng loại*@
+        @Html.Action("BrandsMenuPartial", "Brands", new { brandsList = ViewBag.BrandsList })
+
+    </div>
+    <!-- /.col-md-3 -->
+    <div class="col-md-9">
+        @* Thông tin chi tiết 1 sản phẩm*@
+
+        <div class="row" id="productMain">
+            <div class="col-sm-6">
+                <div id="mainImage">
+                    <img src="@photo_01.PictureUrl" alt="" style="height: 400px;" class="img-responsive">
+                </div>
+
+                <div class="ribbon sale">
+                    <div class="theribbon">SALE</div>
+                    <div class="ribbon-background"></div>
+                </div>
+                <!-- /.ribbon -->
+
+                <div class="ribbon new">
+                    <div class="theribbon">NEW</div>
+                    <div class="ribbon-background"></div>
+                </div>
+                <!-- /.ribbon -->
+
+            </div>
+            <div class="col-sm-6">
+                <div class="box">
+                    <h1 class="text-center">@Model.Name</h1>
+                    <p class="goToDescription">
+                        <a href="#details" class="scroll-to">Scroll to product details, material & care and sizing</a>
+                    </p>
+                    <p class="price">@Model.Price.ToString("$#,##0.00")</p>
+
+                    <div class="text-center buttons">
+                        @*<a href="basket.html" class="btn btn-primary"><i class="fa fa-shopping-cart"></i> Add to cart</a>
+                            <a href="basket.html" class="btn btn-default"><i class="fa fa-heart"></i> Add to wishlist</a>*@
+
+                        @* ===== Cách 1 ===== *@
+                        @*
+                            @using (Html.BeginForm("Them", "GioHang"))
+                            {
+                                @Html.Hidden("sanPhamID", Model.SanPhamID)
+                                <button type="submit" class="btn btn-primary" style="margin-top: 6px;">
+                                    <i class="fa fa-shopping-cart"></i> Add to cart
+                                </button>
+                                @Html.TextBox("soLuong", 1, htmlAttributes: new { @class = "form-control", @style = "display: inline; width: 70px;" })
+                            }
+                        *@
+
+
+                        @* ===== Cách 2 ===== *@
+                        @*
+                            @using (Html.BeginForm("Them", "GioHang", new { sanPhamID = Model.SanPhamID }, FormMethod.Post, htmlAttributes: new { @style = "display: inline" } ))
+                            {
+                                <button type="submit" class="btn btn-primary" style="margin-top: 6px;">
+                                    <i class="fa fa-shopping-cart"></i> Add to cart
+                                </button>
+                                @Html.TextBox("soLuong", 1, htmlAttributes: new { @class = "form-control", @style = "display: inline; width: 70px;" })
+                            }
+                        *@
+
+
+                        @* ===== Cách 3: Tích hợp Partial View vào =====
+    @Html.Partial("_AddToCart01Partial", Model.Id)
+                        *@
+
+                    </div>
+                </div>
+
+                <div class="row" id="thumbs">
+                    <div class="col-xs-4">
+                        <a href="@photo_01.PictureUrl" class="thumb">
+                            <img src="@photo_01.PictureUrl" alt="" class="img-responsive">
+                        </a>
+                    </div>
+                    <div class="col-xs-4">
+                        @if (photo_02 != null)
+                        {
+                            <a href="@photo_02.PictureUrl" class="thumb">
+                                <img src="@photo_02.PictureUrl" alt="" class="img-responsive">
+                            </a>
+                        }
+                    </div>
+                    <div class="col-xs-4">
+                        @if (photo_03 != null)
+                        {
+                            <a href="@photo_03.PictureUrl" class="thumb">
+                                <img src="@photo_03.PictureUrl" alt="" class="img-responsive">
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="box" id="details">
+            <h4>Product details</h4>
+            <h4>Nguồn gốc sản phẩm</h4>
+            <ul>
+                <li>Nhà sản xuất: @Model.ProductBrand.Name</li>
+                <li>Loại: @Model.ProductType.Name</li>
+            </ul>
+            <blockquote>
+                <p>
+                    <em>@Model.Description</em>
+                </p>
+            </blockquote>
+
+            <hr>
+            <div class="social">
+                <h4>Show it to your friends</h4>
+                <p>
+                    <a href="#" class="external facebook" data-animate-hover="pulse"><i class="fa fa-facebook"></i></a>
+                    <a href="#" class="external gplus" data-animate-hover="pulse"><i class="fa fa-google-plus"></i></a>
+                    <a href="#" class="external twitter" data-animate-hover="pulse"><i class="fa fa-twitter"></i></a>
+                    <a href="#" class="email" data-animate-hover="pulse"><i class="fa fa-envelope"></i></a>
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- /.col-md-9 -->
+    <!-- /.container -->
+</div>
+

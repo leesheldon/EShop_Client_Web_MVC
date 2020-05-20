@@ -1,0 +1,43 @@
+﻿@using Client_Web_MVC.Models
+
+@{
+    var brandsList = ViewBag.BrandsList as List<ProductBrand>;
+}
+
+<!-- *** MENUS AND FILTERS ***
+_________________________________________________________ -->
+<div class="panel panel-default sidebar-menu">
+
+    <div class="panel-heading">
+        <h3 class="panel-title">Chủng loại</h3>
+    </div>
+
+    <div class="panel-body">
+        <ul class="nav nav-pills nav-stacked category-menu">
+            @foreach (var item in brandsList)
+            {
+                <li class="active">
+                    <a href="@Url.Action("SearchByBrand", "Products", new { id = item.Id })">
+                    @*<a href="@Url.Action("Index", "Products", new { brandId = item.Id })">*@
+                        @item.Name
+                        <span class="badge pull-right">123</span>
+                    </a>
+                    <ul>
+                        <li>
+                            <a href="#">Test 01</a>
+                        </li>
+                        <li>
+                            <a href="#">Test 02</a>
+                        </li>
+                        <li>
+                            <a href="#">Test 03</a>
+                        </li>
+                    </ul>
+                </li>
+            }
+        </ul>
+
+    </div>
+</div>
+<!-- *** MENUS AND FILTERS END *** -->
+
