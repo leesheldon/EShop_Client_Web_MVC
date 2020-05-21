@@ -1,0 +1,112 @@
+﻿@model Client_Web_MVC.Models.ViewModels.Product_PhotosViewModel
+
+@{
+    ViewBag.Title = "Edit Photo";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Edit Photo</h2>
+<br />
+<h4>@Model.Product.Name</h4>
+<br />
+<div class="text-danger">@ViewBag.ErrMsg</div>
+<hr />
+
+<button class="btn btn-success" id="btnAddNew">
+    <i class="glyphicon glyphicon-plus"></i> Add New Photo
+</button>
+<br />
+<br />
+
+<div class="row" id="addPhoto">
+    <div class="col-md-10">
+        @{ 
+            var productId = Model.Product.Id;
+        }
+        @using (Html.BeginForm("UploadNewPhoto", "AdminProducts", FormMethod.Post, htmlAttributes: new { enctype = "multipart/form-data" }))
+        {
+            @Html.AntiForgeryToken()                    
+            <input hidden name="id" value="@productId" />
+
+
+            <div class="container">
+                <div class="form-group">
+                    <label for="txtFile_Showing">File (Supported Files .png | .jpg)</label>
+
+                    <div class="input-group">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button" id="btnFakeBrowse">Browse...</button>
+                        </span>
+
+                        <input type="file" id="newPhotoFile" name="newPhotoFile" style="display: none">
+                        <input type="text" class="form-control" id="txtFakeFile" readonly>
+                    </div>
+                </div>
+                <input type="submit" class="btn btn-danger" value="Upload" />
+            </div>
+           
+            <br />
+        }
+    </div>
+</div>
+<br />
+<br />
+<div class="row" id="listPhotos">
+    <h4>List....</h4>
+</div>
+
+<br />
+<br />
+<div>
+    @Html.ActionLink("Back to list", "Index")
+</div>
+
+<script type='text/javascript'>
+    $(document).ready(function () {
+        $("#addPhoto").hide();
+
+        $('#btnAddNew').html("<i class=\"fa fa-plus\"></i> Add New Photo");
+    });
+
+    // Switch between Add new Photo / List of Photos
+    $('#btnAddNew').click(function (e) {
+        var txt = $(e.target).text();
+
+        if (txt.endsWith("Add New Photo")) {
+            $("#listPhotos").hide();
+            $("#addPhoto").show();
+
+            $('#btnAddNew').text('Cancel');
+
+            $("#btnAddNew").removeClass('btn-success');
+            $(this).addClass('btn-dark');
+
+            e.preventDefault();
+        } else if (txt === "Cancel") {
+            $("#addPhoto").hide();
+            $("#listPhotos").show();
+                                        
+            $('#btnAddNew').html("<i class=\"fa fa-plus\"></i> Add New Photo");
+            $("#btnAddNew").removeClass('btn-dark');
+            $(this).addClass('btn-success');
+
+            e.preventDefault();
+        }
+    });
+
+    // Browse new photo to Upload
+    $('#btnFakeBrowse, #txtFakeFile').on('click', function () {
+        $('#newPhotoFile').trigger("click");
+    });
+
+    $('#newPhotoFile').change(function () {
+        var file_name = this.value.replace(/\\/g, '/').replace(/.*\//, '');
+        $('#txtFakeFile').val(file_name);
+    });
+    
+</script>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+

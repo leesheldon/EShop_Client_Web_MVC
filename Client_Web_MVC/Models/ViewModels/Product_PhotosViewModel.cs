@@ -5,9 +5,9 @@ using System.Web;
 
 namespace Client_Web_MVC.Models.ViewModels
 {
-    public class ProductsViewModel
+    public class Product_PhotosViewModel
     {
-        public IReadOnlyList<Product> Products { get; set; }
+        public Product Product { get; set; }
 
         public List<Photo> Photos { get; set; }
 

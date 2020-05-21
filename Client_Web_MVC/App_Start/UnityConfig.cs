@@ -19,6 +19,7 @@ namespace Client_Web_MVC
             container.RegisterType<IUserSession, UserSession>();
             container.RegisterType<IProductService, ProductService>();
             container.RegisterType<IAccountService, AccountService>();
+            container.RegisterType<IPhotoService, PhotoService>();
 
             DependencyResolver.SetResolver(new UnityDependencyResolver(container));
         }

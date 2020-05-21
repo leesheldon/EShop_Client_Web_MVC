@@ -22,7 +22,8 @@ namespace Client_Web_MVC.App_Start
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
-                      "~/Content/site.css"));
+                      "~/Content/site.css")
+                      .Include("~/Content/fontawesome/font-awesome.min.css", new CssRewriteUrlTransform()));
 
         }
 

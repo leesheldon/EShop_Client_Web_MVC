@@ -18,7 +18,7 @@ namespace Client_Web_MVC.Controllers
 {
     public class ProductsController : Controller
     {
-        public ProductsViewModel vm { get; set; }
+        public Products_PhotosViewModel vm { get; set; }
         private readonly IUserSession _userSession;
         private readonly IProductService _productService;
 
@@ -66,7 +66,7 @@ namespace Client_Web_MVC.Controllers
                 }
 
                 ViewBag.Url_Img_PlaceHolder = SD.BaseUrl + SD.Url_Pic_PlaceHolder;
-                vm = new ProductsViewModel
+                vm = new Products_PhotosViewModel
                 {
                     Products = productsList,
                     Photos = photosList
@@ -184,7 +184,7 @@ namespace Client_Web_MVC.Controllers
                 }
 
                 ViewBag.Url_Img_PlaceHolder = SD.BaseUrl + SD.Url_Pic_PlaceHolder;
-                vm = new ProductsViewModel
+                vm = new Products_PhotosViewModel
                 {
                     Products = productsList,
                     Photos = photosList

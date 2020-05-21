@@ -1,5 +1,6 @@
 ﻿using Client_Web_MVC.Extensions;
 using Client_Web_MVC.Models;
+using Client_Web_MVC.Models.ViewModels;
 using Client_Web_MVC.Services;
 using Newtonsoft.Json;
 using System;
@@ -23,11 +24,13 @@ namespace Client_Web_MVC.Controllers
     {
         private readonly IUserSession _userSession;
         private readonly IProductService _productService;
+        private readonly IPhotoService _photoService;
 
-        public AdminProductsController(IUserSession userSession, IProductService productService)
+        public AdminProductsController(IUserSession userSession, IProductService productService, IPhotoService photoService)
         {
             _userSession = userSession;
             _productService = productService;
+            _photoService = photoService;
         }
                 
         public async Task<ActionResult> GetBrands_And_Types_List(int? selectedBrandId, int? selectedTypeId)
@@ -194,22 +197,19 @@ namespace Client_Web_MVC.Controllers
             try
             {
                 Product productFromDb = new Product();
-                HttpResponseMessage response = await _productService.GetProduct(id);
-                var responseData = response.Content.ReadAsStringAsync().Result;
+                int productId = (id ?? 1);
+                Dictionary<string, object> result = new Dictionary<string, object>();
+                result = await GetProductFromDB(productId, "EditProduct");
 
-                if (!response.IsSuccessStatusCode)
+                if (result["Product"] == null)
                 {
-                    object cauThongBao = $"Error in finding Product to edit!<br /> Reason: {responseData}";
-                    return View("Error", cauThongBao);
+                    return View("Error", result["ErrObj"]);
                 }
-
-                productFromDb = JsonConvert.DeserializeObject<Product>(responseData);
-                if (productFromDb == null)
+                else
                 {
-                    object cauThongBao = $"Cannot find Product with Id (" + id.ToString() + ").";
-                    return View("Error", cauThongBao);
+                    productFromDb = result["Product"] as Product;
                 }
-
+                
                 // Get Brands and Types list
                 object errObj = await GetBrands_And_Types_List(productFromDb.ProductBrandId, productFromDb.ProductTypeId);
                 if (errObj != null)
@@ -299,20 +299,17 @@ namespace Client_Web_MVC.Controllers
             try
             {
                 Product productFromDb = new Product();
-                HttpResponseMessage response = await _productService.GetProduct(id);
-                var responseData = response.Content.ReadAsStringAsync().Result;
+                int productId = (id ?? 1);
+                Dictionary<string, object> result = new Dictionary<string, object>();
+                result = await GetProductFromDB(productId, "Delete");
 
-                if (!response.IsSuccessStatusCode)
+                if (result["Product"] == null)
                 {
-                    object cauThongBao = $"Error in finding Product to delete!<br /> Reason: {responseData}";
-                    return View("Error", cauThongBao);
+                    return View("Error", result["ErrObj"]);
                 }
-
-                productFromDb = JsonConvert.DeserializeObject<Product>(responseData);
-                if (productFromDb == null)
+                else
                 {
-                    object cauThongBao = $"Cannot find Product with Id (" + id.ToString() + ").";
-                    return View("Error", cauThongBao);
+                    productFromDb = result["Product"] as Product;
                 }
 
                 return View(productFromDb);
@@ -353,7 +350,7 @@ namespace Client_Web_MVC.Controllers
 
                     if (response.IsSuccessStatusCode)
                     {
-                        // Edit Product successfully
+                        // Delete Product successfully
                         return RedirectToAction("Index");
                     }
 
@@ -373,6 +370,164 @@ namespace Client_Web_MVC.Controllers
         }
 
         #endregion
+
+        #region Edit Photo
+        public async Task<ActionResult> EditPhoto(int? id)
+        {
+            if (id == null || id < 1)
+            {
+                return RedirectToAction("Index");
+            }
+
+            try
+            {
+                Product productFromDb = new Product();
+
+                int productId = (id ?? 1);
+                Dictionary<string, object> result = new Dictionary<string, object>();
+                result = await GetProductFromDB(productId, "EditPhoto");
+
+                if (result["Product"] == null)
+                {
+                    return View("Error", result["ErrObj"]);
+                }
+                else
+                {
+                    productFromDb = result["Product"] as Product;
+                }
+
+                Product_PhotosViewModel vm = new Product_PhotosViewModel
+                {
+                    Product = productFromDb,
+                    Photos = productFromDb.Photos as List<Photo>
+                };
+
+                return View(vm);
+            }
+            catch (Exception ex)
+            {
+                object cauThongBao = $"Error in editing Product photo!<br /> Reason: {ex.Message}";
+                return View("Error", cauThongBao);
+            }
+        }
+
+        [HttpPost, ActionName("UploadNewPhoto")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> EditPhoto(HttpPostedFileBase newPhotoFile, int id)
+        {
+            try
+            {
+                Product productFromDb = new Product();
+                ViewBag.ErrMsg = "";
+                Product_PhotosViewModel vm = new Product_PhotosViewModel();
+
+                if (newPhotoFile != null && newPhotoFile.ContentLength > 0)
+                {
+                    // Validate File extension
+                    string extensionsList = "png,jpg,jpeg,gif";
+                    List<string> allowedExtensions = extensionsList.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                    bool isValid = allowedExtensions.Any(y => newPhotoFile.FileName.EndsWith(y));
+
+                    ViewBag.ErrMsg = isValid ? "" : "'" + newPhotoFile.FileName + "' file is not supported. Please select only Supported Files .png | .jpg";
+
+                    // Validate file size                   
+                    int maxContentLength = 1024 * 1024 * 2; //2 MB
+                    if (newPhotoFile.ContentLength > maxContentLength)
+                    {
+                        ViewBag.ErrMsg = "Your file is too large, maximum allowed size is: " + maxContentLength + " MB";
+                    }
+
+                    if (ViewBag.ErrMsg == "")
+                    {
+                        // Upload Photo
+                        HttpResponseMessage response = await _photoService.UploadNewPhoto(id, newPhotoFile);
+                        var responseData = response.Content.ReadAsStringAsync().Result;
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            object cauThongBao = $"Error in uploading Photo!<br /> Reason: {responseData}";
+                            return View("Error", cauThongBao);
+                        }
+
+                        // Upload Photo successfully
+                    }
+                }
+                else
+                {
+                    ViewBag.ErrMsg = "Please select file or your selected file with empty content.";
+                }
+
+                // Get Product from Database
+                Dictionary<string, object> result = new Dictionary<string, object>();
+                result = await GetProductFromDB(id, "EditPhoto");
+
+                if (result["Product"] == null)
+                {
+                    return View("Error", result["ErrObj"]);
+                }
+                else
+                {
+                    productFromDb = result["Product"] as Product;
+                }
+
+                // View Model
+                vm.Product = productFromDb;
+                vm.Photos = productFromDb.Photos as List<Photo>;
+                
+                return View("EditPhoto", vm);
+            }
+            catch (Exception ex)
+            {
+                object cauThongBao = $"Error in uploading new Photo!<br /> Reason: {ex.Message}";
+                return View("Error", cauThongBao);
+            }
+        }
+
+        #endregion
+
+        public async Task<Dictionary<string, object>> GetProductFromDB(int id, string action)
+        {
+            Dictionary<string, object> result = new Dictionary<string, object>();
+            object cauThongBao = null;
+
+            HttpResponseMessage response = await _productService.GetProduct(id);
+            var responseData = response.Content.ReadAsStringAsync().Result;
+
+            if (!response.IsSuccessStatusCode)
+            {
+                if (action == "EditPhoto")
+                {
+                    cauThongBao = $"Error in finding Product to edit photo!<br /> Reason: {responseData}";
+                } else if (action == "Delete")
+                {
+                    cauThongBao = $"Error in finding Product to delete!<br /> Reason: {responseData}";
+                } else if (action == "EditProduct")
+                {
+                    cauThongBao = $"Error in finding Product to edit!<br /> Reason: {responseData}";
+                }
+                                
+                result.Add("ErrObj", cauThongBao);
+                result.Add("Product", null);
+            }
+            else
+            {
+                Product productFromDb = new Product();
+                productFromDb = JsonConvert.DeserializeObject<Product>(responseData);
+                if (productFromDb == null)
+                {
+                    cauThongBao = $"Cannot find Product with Id (" + id.ToString() + ").";
+
+                    result.Add("ErrObj", cauThongBao);
+                    result.Add("Product", null);
+                }
+                else
+                {
+                    result.Add("ErrObj", null);
+                    result.Add("Product", productFromDb);
+                }                
+            }
+            
+            return result;
+        }
 
 
     }
