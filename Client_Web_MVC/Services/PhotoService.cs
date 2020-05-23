@@ -51,5 +51,53 @@ namespace Client_Web_MVC.Services
             }
         }
 
+        public async Task<HttpResponseMessage> SetMainPhoto(int id, int photoId)
+        {
+            using (var client = new HttpClient())
+            {
+                string requestParams = "api/products/" + id.ToString() + "/photo/" + photoId.ToString();
+                // Access token
+                string accessToken = "";
+                accessToken = _userSession.AccessToken;
+
+                client.BaseAddress = new Uri(SD.BaseUrl);
+
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls12 |
+                    SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+
+                client.DefaultRequestHeaders.Clear();
+
+                var request = new HttpRequestMessage(HttpMethod.Post, requestParams);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                HttpResponseMessage response = await client.SendAsync(request);
+
+                return response;
+            }
+        }
+
+        public async Task<HttpResponseMessage> DeletePhoto(int id, int photoId)
+        {
+            using (var client = new HttpClient())
+            {
+                string requestParams = "api/products/" + id.ToString() + "/photo/" + photoId.ToString();
+                // Access token
+                string accessToken = "";
+                accessToken = _userSession.AccessToken;
+
+                client.BaseAddress = new Uri(SD.BaseUrl);
+
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls12 |
+                    SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+
+                client.DefaultRequestHeaders.Clear();
+
+                var request = new HttpRequestMessage(HttpMethod.Delete, requestParams);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                HttpResponseMessage response = await client.SendAsync(request);
+
+                return response;
+            }
+        }
+
     }
 }

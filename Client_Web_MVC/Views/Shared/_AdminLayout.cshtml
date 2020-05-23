@@ -47,20 +47,20 @@
 
     <div class="container-fluid" style="margin-top: 50px;">
         <div class="row">
-            <div class="col-sm-2 hidden-xs" style="min-height: 600px; background-color: #ff6a00">
+            @*<div class="col-sm-2 hidden-xs" style="min-height: 600px; background-color: #ff6a00">*@
                 @* Tích hợp partial view vào *@
                @* @Html.Action("NewProductsList", "AdminProducts", new { n = 3 })*@
 
                 @* Cho phép view chèn nội dung (nếu có) *@
                 @RenderSection("SideBarLeft", false)
-            </div>
-            <div class="col-sm-10">
+            @*</div>*@
+            <div class="col-sm-12">
                 @* Nội dung thiết kế chính của từng view *@
                 @RenderBody()
             </div>
         </div>        
     </div>
-    <footer class="container-fluid" style="color: white; background-color: #423e3e">
+    <footer class="container-fluid" style="color: white; background-color: #423e3e; bottom:0;position: fixed;">
         &copy; @DateTime.Today.Year - Siêu thị điện máy ABC
     </footer>
 

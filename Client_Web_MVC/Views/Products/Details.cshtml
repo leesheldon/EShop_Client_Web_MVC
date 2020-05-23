@@ -5,7 +5,7 @@
     ViewBag.Title = "Details";
     Layout = "~/Views/Shared/_DienMayLayout.cshtml";
 
-    Photo photo_01 = Model.Photos.Where(i => i.Id == Model.Id && i.IsMain == true).FirstOrDefault();
+    Photo photo_01 = Model.Photos.Where(i => i.IsMain == true).FirstOrDefault();
     Photo photo_02 = null;
     Photo photo_03 = null;
 
@@ -17,7 +17,7 @@
     }
     else
     {
-        photo_02 = Model.Photos.Where(i => i.Id == Model.Id && i.Id != photo_01.Id).FirstOrDefault();
+        photo_02 = Model.Photos.Where(i => i.Id != photo_01.Id).FirstOrDefault();
     }
 
     if (photo_02 == null)
@@ -28,7 +28,7 @@
     }
     else
     {
-        photo_03 = Model.Photos.Where(i => i.Id == Model.Id && i.Id != photo_01.Id && i.Id != photo_02.Id).FirstOrDefault();
+        photo_03 = Model.Photos.Where(i => i.Id != photo_01.Id && i.Id != photo_02.Id).FirstOrDefault();
     }
 
     if (photo_03 == null)

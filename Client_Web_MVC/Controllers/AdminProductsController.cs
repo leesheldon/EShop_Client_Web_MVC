@@ -201,13 +201,17 @@ namespace Client_Web_MVC.Controllers
                 Dictionary<string, object> result = new Dictionary<string, object>();
                 result = await GetProductFromDB(productId, "EditProduct");
 
-                if (result["Product"] == null)
+                if (result["ViewModel"] == null)
                 {
                     return View("Error", result["ErrObj"]);
                 }
+                else if ((result["ViewModel"] as Product_PhotosViewModel).Product == null)
+                {
+                    return View("Error", $"Error in finding Product to edit!<br />");
+                }
                 else
                 {
-                    productFromDb = result["Product"] as Product;
+                    productFromDb = (result["ViewModel"] as Product_PhotosViewModel).Product;
                 }
                 
                 // Get Brands and Types list
@@ -302,14 +306,18 @@ namespace Client_Web_MVC.Controllers
                 int productId = (id ?? 1);
                 Dictionary<string, object> result = new Dictionary<string, object>();
                 result = await GetProductFromDB(productId, "Delete");
-
-                if (result["Product"] == null)
+                
+                if (result["ViewModel"] == null)
                 {
                     return View("Error", result["ErrObj"]);
                 }
+                else if ((result["ViewModel"] as Product_PhotosViewModel).Product == null)
+                {
+                    return View("Error", $"Error in finding Product to delete!<br />");
+                }
                 else
                 {
-                    productFromDb = result["Product"] as Product;
+                    productFromDb = (result["ViewModel"] as Product_PhotosViewModel).Product;
                 }
 
                 return View(productFromDb);
@@ -381,26 +389,20 @@ namespace Client_Web_MVC.Controllers
 
             try
             {
-                Product productFromDb = new Product();
+                Product_PhotosViewModel vm = new Product_PhotosViewModel();
 
                 int productId = (id ?? 1);
                 Dictionary<string, object> result = new Dictionary<string, object>();
                 result = await GetProductFromDB(productId, "EditPhoto");
-
-                if (result["Product"] == null)
+                                
+                if (result["ViewModel"] == null)
                 {
                     return View("Error", result["ErrObj"]);
                 }
                 else
                 {
-                    productFromDb = result["Product"] as Product;
+                    vm = result["ViewModel"] as Product_PhotosViewModel;
                 }
-
-                Product_PhotosViewModel vm = new Product_PhotosViewModel
-                {
-                    Product = productFromDb,
-                    Photos = productFromDb.Photos as List<Photo>
-                };
 
                 return View(vm);
             }
@@ -417,9 +419,8 @@ namespace Client_Web_MVC.Controllers
         {
             try
             {
-                Product productFromDb = new Product();
-                ViewBag.ErrMsg = "";
                 Product_PhotosViewModel vm = new Product_PhotosViewModel();
+                ViewBag.ErrMsg = "";                
 
                 if (newPhotoFile != null && newPhotoFile.ContentLength > 0)
                 {
@@ -437,9 +438,10 @@ namespace Client_Web_MVC.Controllers
                         ViewBag.ErrMsg = "Your file is too large, maximum allowed size is: " + maxContentLength + " MB";
                     }
 
+                    // Upload Photo
                     if (ViewBag.ErrMsg == "")
                     {
-                        // Upload Photo
+                        // Upload Photo via API
                         HttpResponseMessage response = await _photoService.UploadNewPhoto(id, newPhotoFile);
                         var responseData = response.Content.ReadAsStringAsync().Result;
                         if (!response.IsSuccessStatusCode)
@@ -449,6 +451,7 @@ namespace Client_Web_MVC.Controllers
                         }
 
                         // Upload Photo successfully
+                        ViewBag.SuccessMsg = newPhotoFile.FileName + " has been uploaded successfully!";
                     }
                 }
                 else
@@ -459,20 +462,16 @@ namespace Client_Web_MVC.Controllers
                 // Get Product from Database
                 Dictionary<string, object> result = new Dictionary<string, object>();
                 result = await GetProductFromDB(id, "EditPhoto");
-
-                if (result["Product"] == null)
+                                
+                if (result["ViewModel"] == null)
                 {
                     return View("Error", result["ErrObj"]);
                 }
                 else
                 {
-                    productFromDb = result["Product"] as Product;
+                    vm = result["ViewModel"] as Product_PhotosViewModel;
                 }
 
-                // View Model
-                vm.Product = productFromDb;
-                vm.Photos = productFromDb.Photos as List<Photo>;
-                
                 return View("EditPhoto", vm);
             }
             catch (Exception ex)
@@ -482,14 +481,105 @@ namespace Client_Web_MVC.Controllers
             }
         }
 
+        
+        [HttpPost]
+        [MultipleSubmitButtons(MatchFormKey = "action", MatchFormValue = "Set Main Photo")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> SetMainPhoto(int selectedProductId, int selectedPhotoId)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    HttpResponseMessage response = await _photoService.SetMainPhoto(selectedProductId, selectedPhotoId);
+                    var responseData = response.Content.ReadAsStringAsync().Result;
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        object cauThongBao = $"Error in Set main Photo!<br /> Reason: {responseData}";
+                        return View("Error", cauThongBao);
+                    }
+
+                    // Set main Photo successfully
+                    
+                }
+
+                // Get Product from Database
+                Product_PhotosViewModel vm = new Product_PhotosViewModel();
+
+                Dictionary<string, object> result = new Dictionary<string, object>();
+                result = await GetProductFromDB(selectedProductId, "SetMainPhoto");
+
+                if (result["ViewModel"] == null)
+                {
+                    return View("Error", result["ErrObj"]);
+                }
+                else
+                {
+                    vm = result["ViewModel"] as Product_PhotosViewModel;
+                }
+
+                return View("EditPhoto", vm);
+            }
+            catch (Exception ex)
+            {
+                object cauThongBao = $"Error in Set main Photo!<br /> Reason: {ex.Message}";
+                return View("Error", cauThongBao);
+            }
+        }
+
+
+        [HttpPost]
+        [MultipleSubmitButtons(MatchFormKey = "action", MatchFormValue = "DeletePhoto")]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> DeletePhoto(int selectedProductId, int selectedPhotoId)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    HttpResponseMessage response = await _photoService.DeletePhoto(selectedProductId, selectedPhotoId);
+                    var responseData = response.Content.ReadAsStringAsync().Result;
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        object cauThongBao = $"Error in Delete Photo!<br /> Reason: {responseData}";
+                        return View("Error", cauThongBao);
+                    }
+
+                    // Delete Photo successfully                    
+                }
+
+                // Get Product from Database
+                Product_PhotosViewModel vm = new Product_PhotosViewModel();
+
+                Dictionary<string, object> result = new Dictionary<string, object>();
+                result = await GetProductFromDB(selectedProductId, "DeletePhoto");
+
+                if (result["ViewModel"] == null)
+                {
+                    return View("Error", result["ErrObj"]);
+                }
+                else
+                {
+                    vm = result["ViewModel"] as Product_PhotosViewModel;
+                }
+
+                return View("EditPhoto", vm);
+            }
+            catch (Exception ex)
+            {
+                object cauThongBao = $"Error in Delete Photo!<br /> Reason: {ex.Message}";
+                return View("Error", cauThongBao);
+            }            
+        }
+        
         #endregion
 
-        public async Task<Dictionary<string, object>> GetProductFromDB(int id, string action)
+        public async Task<Dictionary<string, object>> GetProductFromDB(int productId, string action)
         {
             Dictionary<string, object> result = new Dictionary<string, object>();
             object cauThongBao = null;
 
-            HttpResponseMessage response = await _productService.GetProduct(id);
+            HttpResponseMessage response = await _productService.GetProduct(productId);
             var responseData = response.Content.ReadAsStringAsync().Result;
 
             if (!response.IsSuccessStatusCode)
@@ -497,16 +587,26 @@ namespace Client_Web_MVC.Controllers
                 if (action == "EditPhoto")
                 {
                     cauThongBao = $"Error in finding Product to edit photo!<br /> Reason: {responseData}";
-                } else if (action == "Delete")
+                }
+                else if (action == "Delete")
                 {
                     cauThongBao = $"Error in finding Product to delete!<br /> Reason: {responseData}";
-                } else if (action == "EditProduct")
+                }
+                else if (action == "EditProduct")
                 {
                     cauThongBao = $"Error in finding Product to edit!<br /> Reason: {responseData}";
                 }
-                                
+                else if (action == "SetMainPhoto")
+                {
+                    cauThongBao = $"Error in finding Product to Set main Photo!<br /> Reason: {responseData}";
+                }
+                else if (action == "DeletePhoto")
+                {
+                    cauThongBao = $"Error in finding Product to Delete Photo!<br /> Reason: {responseData}";
+                }
+
                 result.Add("ErrObj", cauThongBao);
-                result.Add("Product", null);
+                result.Add("ViewModel", null);
             }
             else
             {
@@ -514,21 +614,29 @@ namespace Client_Web_MVC.Controllers
                 productFromDb = JsonConvert.DeserializeObject<Product>(responseData);
                 if (productFromDb == null)
                 {
-                    cauThongBao = $"Cannot find Product with Id (" + id.ToString() + ").";
+                    cauThongBao = $"Cannot find Product with Id (" + productId.ToString() + ").";
 
                     result.Add("ErrObj", cauThongBao);
-                    result.Add("Product", null);
+                    result.Add("ViewModel", null);
                 }
                 else
                 {
+                    Product_PhotosViewModel vm = new Product_PhotosViewModel();
+
+                    List<Photo> photosList = new List<Photo>();
+                    photosList.AddRange(productFromDb.Photos);
+
+                    // View Model
+                    vm.Product = productFromDb;
+                    vm.Photos = photosList;
+
                     result.Add("ErrObj", null);
-                    result.Add("Product", productFromDb);
+                    result.Add("ViewModel", vm);
                 }                
             }
             
             return result;
         }
-
-
+        
     }
 }

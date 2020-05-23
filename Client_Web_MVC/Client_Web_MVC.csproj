@@ -338,6 +338,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ProductsController.cs" />
     <Compile Include="Extensions\IUserSession.cs" />
+    <Compile Include="Extensions\MultipleSubmitButtonsAttribute.cs" />
     <Compile Include="Extensions\SD.cs" />
     <Compile Include="Extensions\UserSession.cs" />
     <Compile Include="Global.asax.cs">

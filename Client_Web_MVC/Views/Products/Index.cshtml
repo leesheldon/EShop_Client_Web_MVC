@@ -27,7 +27,7 @@
 
             @foreach (var item in Model.Products)
             {
-                Photo photo_01 = Model.Photos.Where(i => i.Id == item.Id && i.IsMain == true).FirstOrDefault();
+                Photo photo_01 = Model.Photos.Where(i => i.ProductId == item.Id && i.IsMain == true).FirstOrDefault();
                 Photo photo_02 = null;
 
                 if (photo_01 == null)
@@ -38,7 +38,7 @@
                 }
                 else
                 {
-                    photo_02 = Model.Photos.Where(i => i.Id == item.Id && i.Id != photo_01.Id).FirstOrDefault();
+                    photo_02 = Model.Photos.Where(i => i.ProductId == item.Id && i.Id != photo_01.Id).FirstOrDefault();
                 }
                 
                 if (photo_02 == null)
