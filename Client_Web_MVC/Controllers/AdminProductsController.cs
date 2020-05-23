@@ -74,7 +74,7 @@ namespace Client_Web_MVC.Controllers
 
             List<Product> productsList = new List<Product>();
             int totalItems = 0;
-            int pageSize = 50;
+            int pageSize = 5;
             int pageIndex = (page ?? 1);
 
             try

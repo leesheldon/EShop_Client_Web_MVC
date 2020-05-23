@@ -7,11 +7,16 @@
     WebGrid grid = null;
     try
     {
-        grid = new WebGrid(source: Model, rowsPerPage: 50);
+        //grid = new WebGrid(source: Model, rowsPerPage: 5);
+        
+        grid = new WebGrid(rowsPerPage: 5);
+        grid.Bind(Model,
+        autoSortAndPage: false,
+        rowCount: ViewBag.TotalItems);    
     }
     catch (Exception ex)
     {
-        thongBaoLoi = "Lỗi: Truy xuất dữ liệu.";
+        thongBaoLoi = $"Lỗi: Truy xuất dữ liệu.<br /> Reason: {ex.Message}";
     }
 }
 
@@ -25,7 +30,7 @@
     @grid.GetHtml(
         tableStyle: "table table-bordered table-hover",
         footerStyle: "text-center",
-        mode: WebGridPagerModes.All, firstText: "Trang đầu", lastText: "Trang cuối", previousText: "Trang trước", nextText: "Trang kế",
+        mode: WebGridPagerModes.All, firstText: "Trang đầu", lastText: "Trang cuối", previousText: "<", nextText: ">",
         numericLinksCount: 20,
         columns: grid.Columns(
             grid.Column("Id", header: "ID", canSort: true),
