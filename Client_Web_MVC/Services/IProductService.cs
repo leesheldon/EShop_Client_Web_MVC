@@ -9,7 +9,7 @@ namespace Client_Web_MVC.Services
 {
     public interface IProductService
     {
-        Task<HttpResponseMessage> GetProductsList(string search_Data,
+        Task<HttpResponseMessage> GetProductsList(string search_Data, string sort_Data,
             int pageIndex, int pageSize, int? brandId, int? typeId);
 
         Task<HttpResponseMessage> GetProduct(int? id);

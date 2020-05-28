@@ -39,7 +39,7 @@ namespace Client_Web_MVC.Controllers
             try
             {
                 // Brand Id = -1, Type Id = -1 means that we do not find products by Brand Id, Type Id
-                HttpResponseMessage response = await _productService.GetProductsList(search_Data, pageIndex, pageSize, -1, -1);
+                HttpResponseMessage response = await _productService.GetProductsList(search_Data, "", pageIndex, pageSize, -1, -1);
                 
                 var responseData = response.Content.ReadAsStringAsync().Result;
 
@@ -152,7 +152,7 @@ namespace Client_Web_MVC.Controllers
             try
             {
                 // Type Id = -1 means that we do not find products by Brand Id, Type Id
-                HttpResponseMessage response = await _productService.GetProductsList("", pageIndex, pageSize, id, -1);
+                HttpResponseMessage response = await _productService.GetProductsList("", "", pageIndex, pageSize, id, -1);
 
                 //Storing the response details recieved from web api   
                 var responseData = response.Content.ReadAsStringAsync().Result;

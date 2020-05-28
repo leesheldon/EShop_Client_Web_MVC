@@ -68,19 +68,34 @@ namespace Client_Web_MVC.Controllers
         }
 
         // GET: AdminProducts
-        public async Task<ActionResult> Index(string search_Data, int? page = 1)
+        public async Task<ActionResult> Index(string search_Data, string sort = "Id", string sortdir = "ASC", int? page = 1)
         {
             ViewBag.ProductsAct = "active";
 
-            List<Product> productsList = new List<Product>();
-            int totalItems = 0;
+            List<Product> productsList = new List<Product>();            
             int pageSize = 5;
             int pageIndex = (page ?? 1);
 
             try
             {
+                if (sort == "ProductBrand.Name")
+                {
+                    sort = "brand";
+                }
+                else if (sort == "ProductType.Name")
+                {
+                    sort = "type";
+                }
+                else
+                {
+                    sort = sort.ToLower();
+                }
+
+                sortdir = sortdir.Substring(0, 1).ToUpper() + sortdir.Substring(1).ToLower();
+                sort = sort + sortdir;
+
                 // Brand Id = -1, Type Id = -1 means that we do not find products by Brand Id, Type Id
-                HttpResponseMessage response = await _productService.GetProductsList(search_Data, pageIndex, pageSize, -1, -1);
+                HttpResponseMessage response = await _productService.GetProductsList(search_Data, sort, pageIndex, pageSize, -1, -1);
 
                 //Storing the response details recieved from web api   
                 var responseData = response.Content.ReadAsStringAsync().Result;

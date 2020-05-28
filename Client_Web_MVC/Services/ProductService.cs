@@ -57,7 +57,7 @@ namespace Client_Web_MVC.Services
             }
         }
 
-        public async Task<HttpResponseMessage> GetProductsList(string search_Data, int pageIndex, int pageSize, int? brandId, int? typeId)
+        public async Task<HttpResponseMessage> GetProductsList(string search_Data, string sort_Data, int pageIndex, int pageSize, int? brandId, int? typeId)
         {
             using (var client = new HttpClient())
             {
@@ -66,6 +66,11 @@ namespace Client_Web_MVC.Services
                 if (!string.IsNullOrEmpty(search_Data))
                 {
                     requestParams = requestParams + "&search=" + search_Data;
+                }
+
+                if (!string.IsNullOrEmpty(sort_Data))
+                {
+                    requestParams = requestParams + "&sort=" + sort_Data;
                 }
 
                 if (brandId > -1)
