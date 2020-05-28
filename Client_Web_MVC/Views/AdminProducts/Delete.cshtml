@@ -7,7 +7,6 @@
 
 <h2 class="text-info">Delete Product</h2>
 
-<h3 class="text-danger">Bạn có thật sự muốn xóa không?</h3>
 <div>
     <h4 class="text-info">Product Information</h4>
     <hr />
@@ -59,8 +58,8 @@
         @Html.AntiForgeryToken()
 
         <div class="form-actions no-color">
-            <input type="button" value="Delete" class="btn btn-danger" onclick="validateInput()" /> |
-            @Html.ActionLink("Back to List", "Index")
+            <input type="button" value="Delete" class="btn btn-danger" onclick="validateInput()" />&nbsp;&nbsp;<text>|</text>&nbsp;&nbsp;
+            @Html.ActionLink("Back to list", "Index", null, new { @style = "font-size: x-large;" })
         </div>
     }
 </div>

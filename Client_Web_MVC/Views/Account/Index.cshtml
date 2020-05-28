@@ -1,0 +1,121 @@
+﻿@model List<Client_Web_MVC.Models.UserForCRUD>
+@using Client_Web_MVC.Extensions;
+@using PagedList;
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "Users List";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="text-info text-center">Users List</h2>
+<br />
+<div class="container">
+    <div class="col-md-12 text-center">
+        @using (Html.BeginForm())
+        {
+            <div class="form-horizontal">
+                <div class="form-group">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-2 text-right">
+                        Search Name:&nbsp;
+                    </div>
+                    <div class="col-md-3 text-left">
+                        @Html.TextBox("Search_Data", ViewBag.FilterValue as string)
+                        &nbsp;&nbsp;<input type="submit" value="Apply" />
+                    </div>
+                    <div class="col-md-3"></div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-2 text-right">
+                        @Html.Label("Sort by: ", htmlAttributes: new { @class = "control-label" })
+                        @*Sort by:&nbsp;*@
+                    </div>
+                    <div class="col-md-3 text-left">
+                        <select id="Sort_Data" name="Sort_Data" class="form-control" style="font-family: FontAwesome;">                            
+                            <option value="displaynameAsc">&#xf15d; Display Name</option>                            
+                            <option value="usernameAsc">&#xf15d; User Name</option>
+                            <option value="usernameDesc">&#xf15e; User Name</option>                            
+                        </select>
+                    </div>
+                    <div class="col-md-3"></div>
+                </div>
+            </div>        
+            <br />
+            <br />
+        }
+
+        <div class="form-border">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="text-align:center">@Html.DisplayName("Display Name")</th>
+                        <th style="text-align:center">@Html.DisplayName("User Name")</th>
+                        <th style="text-align:center">@Html.DisplayName("Email")</th>
+                        <th style="text-align:center">@Html.DisplayName("Phone Number")</th>
+                        <th style="text-align:center">@Html.DisplayName("Roles")</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var perUser in Model)
+                    {
+                        bool isAdmin = SD.IsAdmin(perUser.RolesNames);
+
+                        <tr @(perUser.IsLockedOut == true ? "style=color:red" : "style=color:black")>
+                            <td style="text-align: left">
+                                @Html.DisplayFor(m => perUser.DisplayName)
+                            </td>
+                            <td style="text-align: left">
+                                @Html.DisplayFor(m => perUser.UserName)
+                            </td>
+                            <td style="text-align: left">
+                                @Html.DisplayFor(m => perUser.Email)
+                            </td>
+                            <td style="text-align: left">
+                                @Html.DisplayFor(m => perUser.PhoneNumber)
+                            </td>
+                            <td style="text-align: left">
+                                @perUser.RolesNames
+                            </td>
+                            <td style="text-align: center">
+                                <a type="button" class="btn btn-primary"
+                                   href="@Url.Action("Edit", "Account", new { id = perUser.Id } )">
+                                    <i class="fa fa-edit fa-lg"></i>
+                                </a>
+                                @if (!isAdmin)
+                                {
+                                    <a type="button" class="btn btn-danger"
+                                       href="@Url.Action("Delete", "Account", new { id = perUser.Id })">
+                                        <i class="fa fa-trash-o fa-lg"></i>
+                                    </a>
+                                }
+                                @if (perUser.IsLockedOut)
+                                {
+                                    <a type="button" class="btn btn-success"
+                                       href="@Url.Action("UnLock/" + perUser.Id)">
+                                        <i class="fa fa-unlock fa-lg"></i>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a type="button" class="btn btn-warning"
+                                       href="@Url.Action("Lock/" + perUser.Id)">
+                                        <i class="fa fa-lock fa-lg"></i>
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="row text-center">
+            @Html.PagedListPager((IPagedList)ViewBag.OnePageOfUsers, page => Url.Action("Index", new { page }))
+        </div>
+    </div>
+</div>
+

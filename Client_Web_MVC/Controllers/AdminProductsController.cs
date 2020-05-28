@@ -87,7 +87,9 @@ namespace Client_Web_MVC.Controllers
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    object cauThongBao = $"Error in getting list of Products!<br /> Reason: {responseData}";
+                    ResponseObj resObj = JsonConvert.DeserializeObject<ResponseObj>(responseData);
+
+                    object cauThongBao = "Error in getting list of Products!<br /> Reason: " + resObj.Message;
                     return View("Error", cauThongBao);
                 }
 
@@ -162,8 +164,10 @@ namespace Client_Web_MVC.Controllers
                         }
 
                         // Create new Product failed
+                        ResponseObj resObj = JsonConvert.DeserializeObject<ResponseObj>(responseData);
+
                         ModelState.Clear();
-                        ModelState.AddModelError("", $"Error in creating new Product! Reason: {responseData}");
+                        ModelState.AddModelError("", "Error in creating new Product! Reason: " + resObj.Message);
                     }
                 }
 
@@ -268,8 +272,10 @@ namespace Client_Web_MVC.Controllers
                         }
 
                         // Edit Product failed
+                        ResponseObj resObj = JsonConvert.DeserializeObject<ResponseObj>(responseData);
+
                         ModelState.Clear();
-                        ModelState.AddModelError("", $"Error in editing Product! Reason: {responseData}");
+                        ModelState.AddModelError("", "Error in editing Product! Reason: " + resObj.Message);
                     }
                 }
 
@@ -363,8 +369,10 @@ namespace Client_Web_MVC.Controllers
                     }
 
                     // Delete Product failed
+                    ResponseObj resObj = JsonConvert.DeserializeObject<ResponseObj>(responseData);
+
                     ModelState.Clear();
-                    ModelState.AddModelError("", $"Error in deleting Product! Reason: {responseData}");
+                    ModelState.AddModelError("", "Error in deleting Product! Reason: " + resObj.Message);
                 }
 
                 // Delete Product successfully
@@ -446,7 +454,9 @@ namespace Client_Web_MVC.Controllers
                         var responseData = response.Content.ReadAsStringAsync().Result;
                         if (!response.IsSuccessStatusCode)
                         {
-                            object cauThongBao = $"Error in uploading Photo!<br /> Reason: {responseData}";
+                            ResponseObj resObj = JsonConvert.DeserializeObject<ResponseObj>(responseData);
+
+                            object cauThongBao = "Error in uploading Photo!<br /> Reason: " + resObj.Message;
                             return View("Error", cauThongBao);
                         }
 
@@ -495,7 +505,9 @@ namespace Client_Web_MVC.Controllers
                     var responseData = response.Content.ReadAsStringAsync().Result;
                     if (!response.IsSuccessStatusCode)
                     {
-                        object cauThongBao = $"Error in Set main Photo!<br /> Reason: {responseData}";
+                        ResponseObj resObj = JsonConvert.DeserializeObject<ResponseObj>(responseData);
+
+                        object cauThongBao = "Error in Set main Photo!<br /> Reason: " + resObj.Message;
                         return View("Error", cauThongBao);
                     }
 
@@ -541,7 +553,9 @@ namespace Client_Web_MVC.Controllers
                     var responseData = response.Content.ReadAsStringAsync().Result;
                     if (!response.IsSuccessStatusCode)
                     {
-                        object cauThongBao = $"Error in Delete Photo!<br /> Reason: {responseData}";
+                        ResponseObj resObj = JsonConvert.DeserializeObject<ResponseObj>(responseData);
+
+                        object cauThongBao = "Error in Delete Photo!<br /> Reason: " + resObj.Message;
                         return View("Error", cauThongBao);
                     }
 
@@ -584,25 +598,27 @@ namespace Client_Web_MVC.Controllers
 
             if (!response.IsSuccessStatusCode)
             {
+                ResponseObj resObj = JsonConvert.DeserializeObject<ResponseObj>(responseData);
+
                 if (action == "EditPhoto")
                 {
-                    cauThongBao = $"Error in finding Product to edit photo!<br /> Reason: {responseData}";
+                    cauThongBao = "Error in finding Product to edit photo!<br /> Reason: " + resObj.Message;
                 }
                 else if (action == "Delete")
                 {
-                    cauThongBao = $"Error in finding Product to delete!<br /> Reason: {responseData}";
+                    cauThongBao = "Error in finding Product to delete!<br /> Reason: " + resObj.Message;
                 }
                 else if (action == "EditProduct")
                 {
-                    cauThongBao = $"Error in finding Product to edit!<br /> Reason: {responseData}";
+                    cauThongBao = "Error in finding Product to edit!<br /> Reason: " + resObj.Message;
                 }
                 else if (action == "SetMainPhoto")
                 {
-                    cauThongBao = $"Error in finding Product to Set main Photo!<br /> Reason: {responseData}";
+                    cauThongBao = "Error in finding Product to Set main Photo!<br /> Reason: " + resObj.Message;
                 }
                 else if (action == "DeletePhoto")
                 {
-                    cauThongBao = $"Error in finding Product to Delete Photo!<br /> Reason: {responseData}";
+                    cauThongBao = "Error in finding Product to Delete Photo!<br /> Reason: " + resObj.Message;
                 }
 
                 result.Add("ErrObj", cauThongBao);

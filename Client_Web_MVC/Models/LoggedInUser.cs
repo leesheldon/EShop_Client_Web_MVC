@@ -5,7 +5,7 @@ using System.Web;
 
 namespace Client_Web_MVC.Models
 {
-    public class User
+    public class LoggedInUser
     {
         public string Email { get; set; }
         public string DisplayName { get; set; }

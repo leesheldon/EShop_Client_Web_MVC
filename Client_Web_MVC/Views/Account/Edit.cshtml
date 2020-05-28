@@ -1,0 +1,213 @@
+﻿@model Client_Web_MVC.Models.UserForCRUD
+
+@{
+    ViewBag.Title = "Edit User";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Edit User</h2>
+<hr />
+
+@using (Html.BeginForm("Edit", "Account", FormMethod.Post, new { onsubmit = "return onValidation()" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.UserName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-8">
+                @Html.EditorFor(model => model.UserName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-2">
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-8">
+                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-2">
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DisplayName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-8">
+                @Html.EditorFor(model => model.DisplayName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.DisplayName, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-2">
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.PhoneNumber, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-8">
+                @Html.EditorFor(model => model.PhoneNumber, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger" })
+            </div>
+            <div class="col-md-2">
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.LockoutReason, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-8">
+                @Html.EditorFor(model => model.LockoutReason, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+            </div>
+            <div class="col-md-2">
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.UnLockReason, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-8">
+                @Html.EditorFor(model => model.UnLockReason, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+            </div>
+            <div class="col-md-2">
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.LockoutEnd, htmlAttributes: new { @class = "control-label col-md-2" })           
+            <div class="col-md-8">
+                @*<input asp-for="@Model.LockoutEnd" id="lockoutEnd" type="text" asp-format="{0:MM/dd/yyyy}" class="form-control" />*@
+
+                <input id="lockoutEnd_FromPicker" type="text" class="form-control" readonly onchange="PassValueToLockoutEnd()" />
+                @Html.EditorFor(model => model.StringLockoutEnd, new { htmlAttributes = new { @class = "form-control", id = "lockoutEnd", @type = "hidden" } })
+            </div>
+            <div class="col-md-2">
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.RolesNames, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-8 row" id="chkBoxListId">
+                @{
+                    for (int i = 0; i < Model.RolesList.Count(); i++)
+                    {
+                        <div class="col-md-4">
+                            <div class="custom-control custom-checkbox">
+                                @*<input type="checkbox" onchange="changedOnChkBox()" class="custom-control-input" name="@Model.RolesList[i].SelectedRole"
+                                            id="@Model.RolesList[i].Id"  @(Model.RolesList[i].SelectedRole ? "checked" : "") />
+                                <label for="@Model.RolesList[i].Id" class="custom-control-label">@Model.RolesList[i].Name</label>*@
+
+                                <label class="custom-control-label">
+                                    @Html.CheckBoxFor(model => model.RolesList[i].SelectedRole,
+                                    new
+                                    {
+                                        htmlAttributes = new
+                                        {
+                                            @class = "custom-control-input",
+                                            @id = @Model.RolesList[i].Id,
+                                            @type = "checkbox",
+                                            onchange = "changedOnChkBox()"
+                                        }
+                                    }) &nbsp;@Model.RolesList[i].Name
+                                </label>                                
+                                                                                   
+                                @Html.HiddenFor(model => model.RolesList[i].Id)
+                                @Html.HiddenFor(model => model.RolesList[i].Name)
+                            </div>
+                            <br />
+                        </div>                        
+                    }
+                }                
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-2"></div>
+            <div class="col-md-10">
+                <span id="chkboxListErrorId" class="text-danger" style="font-weight: bold;">Please select at least one.</span>    
+            </div>
+        </div>
+        
+        <br />
+        <div class="form-group">
+            <div class="col-md-2"></div>
+            <div class="col-md-8">
+                <input type="submit" value="Update" class="btn btn-primary" />&nbsp;&nbsp;<text>|</text>&nbsp;&nbsp;
+                @Html.ActionLink("Back to list", "Index", null, new { @style = "font-size: x-large;" })
+            </div>
+            <div class="col-md-2">
+            </div>
+        </div>
+    </div>
+                    }
+
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                // Hide check boxes error message
+                $("#chkboxListErrorId").hide();
+
+                // Lockout End
+                var txt = $("#lockoutEnd").val();
+                $("#lockoutEnd_FromPicker").val(txt);
+                
+                // Date time picker
+                $("#lockoutEnd_FromPicker").datetimepicker({
+                    defaultDate: "+1w",
+                    changeMonth: true,
+                    changeYear: true,
+                    controlType: 'select',
+                    //yearRange: "-100:+0", // You can set the year range as per as your need
+                    dateFormat: "dd/mm/yy",
+                    timeFormat: "hh:mm:ss TT"
+                });
+            });
+
+        });
+
+        
+    </script>
+
+    <script type="text/javascript">
+        // Change on check boxes
+        function changedOnChkBox() {
+            var cnt = $("#chkBoxListId input:checked").length;
+            
+            if (cnt < 1) {
+                $("#chkboxListErrorId").show();
+            }
+            else {
+                $("#chkboxListErrorId").hide();
+            }
+        }
+
+        function PassValueToLockoutEnd() {
+            var txt = $("#lockoutEnd_FromPicker").val();
+
+            $("#lockoutEnd").val(txt);
+        }
+
+        // Form validation before submit
+        function onValidation() {
+            var txt = $("#lockoutEnd_FromPicker").val();            
+            $("#lockoutEnd").val(txt);
+
+            var cnt = $("#chkBoxListId input:checked").length;
+            if (cnt < 1) {
+                $("#chkboxListErrorId").show();
+
+                return false;
+            }
+            else {
+                $("#chkboxListErrorId").hide();
+
+                return true;
+            }
+        }
+    </script>
+
+    @Scripts.Render("~/bundles/jqueryval")
+}

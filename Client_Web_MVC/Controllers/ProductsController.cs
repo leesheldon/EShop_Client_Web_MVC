@@ -45,7 +45,9 @@ namespace Client_Web_MVC.Controllers
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    object cauThongBao = $"Error in getting list of Products!<br /> Reason: {responseData}";
+                    ResponseObj resObj = JsonConvert.DeserializeObject<ResponseObj>(responseData);
+
+                    object cauThongBao = "Error in getting list of Products!<br /> Reason: " + resObj.Message;
                     return View("Error", cauThongBao);
                 }
 
@@ -97,7 +99,9 @@ namespace Client_Web_MVC.Controllers
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    object cauThongBao = $"Error in finding Product to view Detail.<br /> Reason: {responseData}";
+                    ResponseObj resObj = JsonConvert.DeserializeObject<ResponseObj>(responseData);
+
+                    object cauThongBao = "Error in finding Product to view Detail.<br /> Reason: " + resObj.Message;
                     return View("Error", cauThongBao);
                 }
 
@@ -155,7 +159,9 @@ namespace Client_Web_MVC.Controllers
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    object cauThongBao = $"Error in getting list of Products!<br /> Reason: {responseData}";
+                    ResponseObj resObj = JsonConvert.DeserializeObject<ResponseObj>(responseData);
+
+                    object cauThongBao = "Error in getting list of Products!<br /> Reason: " + resObj.Message;
                     return View("Error", cauThongBao);
                 }
 

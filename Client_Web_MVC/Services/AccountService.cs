@@ -71,7 +71,7 @@ namespace Client_Web_MVC.Services
             }
         }
 
-        public void SignInCustomIdentity(Controller ctrler, User userLoggedIn)
+        public void SignInCustomIdentity(Controller ctrler, LoggedInUser userLoggedIn)
         {
             var handler = new JwtSecurityTokenHandler();
             JwtSecurityToken jwtToken = handler.ReadJwtToken(userLoggedIn.Token);
@@ -118,5 +118,139 @@ namespace Client_Web_MVC.Services
 
             ctrler.Request.GetOwinContext().Authentication.SignIn(options, identity);
         }
+
+        public async Task<HttpResponseMessage> GetUsersList(string search_Data, string sort_Data, int pageIndex, int pageSize)
+        {
+            using (var client = new HttpClient())
+            {
+                string requestParams = "api/account/userslist?pageSize=" + pageSize + "&pageIndex=" + pageIndex;
+
+                if (!string.IsNullOrEmpty(search_Data))
+                {
+                    requestParams = requestParams + "&search=" + search_Data;
+                }
+
+                if (!string.IsNullOrEmpty(sort_Data))
+                {
+                    requestParams = requestParams + "&sort=" + sort_Data;
+                }
+                                
+                client.BaseAddress = new Uri(SD.BaseUrl);
+                client.DefaultRequestHeaders.Clear();
+                
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls12 |
+                    SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+
+                // Access token
+                string accessToken = _userSession.AccessToken;
+
+                var request = new HttpRequestMessage(HttpMethod.Get, requestParams);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                
+                HttpResponseMessage response = await client.SendAsync(request);
+
+                return response;
+            }
+        }
+
+        public async Task<HttpResponseMessage> GetUser(string id)
+        {
+            using (var client = new HttpClient())
+            {
+                string requestParams = "api/account/user/" + id;
+
+                client.BaseAddress = new Uri(SD.BaseUrl);
+                client.DefaultRequestHeaders.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls12 |
+                SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+
+                // Access token
+                string accessToken = _userSession.AccessToken;
+
+                var request = new HttpRequestMessage(HttpMethod.Get, requestParams);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                HttpResponseMessage response = await client.SendAsync(request);
+
+                return response;
+            }
+        }
+
+        public async Task<HttpResponseMessage> LockUser(UserForCRUD userToLock)
+        {
+            using (var client = new HttpClient())
+            {
+                string requestParams = "api/account/" + userToLock.Id + "/lock";
+
+                client.BaseAddress = new Uri(SD.BaseUrl);
+                client.DefaultRequestHeaders.Clear();
+
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls12 |
+                SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+
+                // Access token
+                string accessToken = _userSession.AccessToken;
+
+                var request = new HttpRequestMessage(HttpMethod.Post, requestParams);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                request.Content = new StringContent(JsonConvert.SerializeObject(userToLock));
+                request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                HttpResponseMessage response = await client.SendAsync(request);
+                return response;
+            }
+        }
+
+        public async Task<HttpResponseMessage> UnLockUser(UserForCRUD userToLock)
+        {
+            using (var client = new HttpClient())
+            {
+                string requestParams = "api/account/" + userToLock.Id + "/unlock";
+
+                client.BaseAddress = new Uri(SD.BaseUrl);
+                client.DefaultRequestHeaders.Clear();
+
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls12 |
+                SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+
+                // Access token
+                string accessToken = _userSession.AccessToken;
+
+                var request = new HttpRequestMessage(HttpMethod.Post, requestParams);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                request.Content = new StringContent(JsonConvert.SerializeObject(userToLock));
+                request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                HttpResponseMessage response = await client.SendAsync(request);
+                return response;
+            }
+        }
+
+        public async Task<HttpResponseMessage> DeleteUser(string id)
+        {
+            using (var client = new HttpClient())
+            {
+                string requestParams = "api/account/" + id + "/delete";
+
+                client.BaseAddress = new Uri(SD.BaseUrl);
+                client.DefaultRequestHeaders.Clear();
+
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 | SecurityProtocolType.Tls12 |
+                SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+
+                // Access token
+                string accessToken = _userSession.AccessToken;
+
+                var request = new HttpRequestMessage(HttpMethod.Delete, requestParams);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+                HttpResponseMessage response = await client.SendAsync(request);
+                return response;
+            }
+        }
+
     }
 }
